@@ -3,9 +3,9 @@ import { object, string } from "zod";
 
 // Define your user schema using Zod
 const userSchema = object({
-  username: string().min(3),
-  email: string().email(),
-  password: string().min(8),
+  username: string().min(3, "Username must be at least 3 characters long"),
+  email: string().email("Invalid email address"),
+  password: string().min(8, "Passwod not strong please give at least 8 characters"),
   // Add more validations as per your requirements
 });
 
@@ -22,24 +22,8 @@ export const validateUser = (
     next();
   } catch (error: any) {
     // If validation fails, format error message and send a response
-    const errorMessage = formatErrorMessage(error.errors);
+    const errorMessage = error.errors[0].message;
     res.status(400).json({ message: errorMessage });
   }
 };
 
-// Function to format error messages
-const formatErrorMessage = (errors: any[]) => {
-  return errors.map((error) => {
-    if (error.path[0] === "username" && error.code === "too_small") {
-      return "Username must be at least 3 characters long.";
-    }
-    if (error.path[0] === "email" && error.code === "invalid_email") {
-      return "Invalid email format.";
-    }
-    if (error.path[0] === "password" && error.code === "too_small") {
-      return "Password must be at least 8 characters long.";
-    }
-    // Add more conditions for other types of errors if needed
-    return error.message;
-  });
-};
