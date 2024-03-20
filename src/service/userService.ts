@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { UserRepo } from "../database/repository/userRepo";
 
 export class UserService {
@@ -16,7 +17,10 @@ export class UserService {
   }
 
   async createUser(userData: any) {
-    return await this.userRepository.createUser(userData);
+    // Hash the password before storing it
+    const hashedPassword = await bcrypt.hash(userData.password, 10); // 10 is the salt rounds
+    const userWithHashedPassword = { ...userData, password: hashedPassword };
+    return await this.userRepository.createUser(userWithHashedPassword);
   }
 
   async updateUser(userId: string, updatedUserData: any) {
