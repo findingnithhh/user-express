@@ -5,7 +5,10 @@ import { object, string } from "zod";
 const userSchema = object({
   username: string().min(3, "Username must be at least 3 characters long"),
   email: string().email("Invalid email address"),
-  password: string().min(8, "Passwod not strong please give at least 8 characters"),
+  password: string().min(
+    8,
+    "Passwod not strong please give at least 8 characters"
+  ),
   // Add more validations as per your requirements
 });
 
@@ -22,8 +25,7 @@ export const validateUser = (
     next();
   } catch (error: any) {
     // If validation fails, format error message and send a response
-    const errorMessage = error.errors[0].message;
-    res.status(400).json({ message: errorMessage });
+    const errorMessages = error.errors.map((e: any) => e.message);
+    res.status(400).json({ message: errorMessages });
   }
 };
-

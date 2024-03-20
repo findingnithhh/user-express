@@ -10,7 +10,7 @@ const StatusCodes: { [key: string]: StatusCode } = {
 
   // Success
   OK: { code: 200, message: "Successfully" },
-  CREATED: { code: 201, message: "Created" },
+  CREATED: { code: 201, message: "Created successfully" },
   ACCEPTED: { code: 202, message: "Accepted" },
   NO_CONTENT: { code: 204, message: "No Content" },
 
