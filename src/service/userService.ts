@@ -1,6 +1,5 @@
-import bcrypt from "bcryptjs";
 import { UserRepo } from "../database/repository/userRepo";
-
+import { hashPassword } from "../utils/hashPassword";
 export class UserService {
   private userRepository: UserRepo;
 
@@ -17,8 +16,7 @@ export class UserService {
   }
 
   async createUser(userData: any) {
-    // Hash the password before storing it
-    const hashedPassword = await bcrypt.hash(userData.password, 10); // 10 is the salt rounds
+    const hashedPassword = await hashPassword(userData.password);
     const userWithHashedPassword = { ...userData, password: hashedPassword };
     return await this.userRepository.createUser(userWithHashedPassword);
   }

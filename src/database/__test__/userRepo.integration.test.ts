@@ -33,7 +33,7 @@ describe("UserRepo Integration Tests", () => {
     const userData = {
       username: "testuser",
       email: "test@example.com",
-      password: "password123",
+      password: "123456789",
     };
 
     // Act
@@ -42,14 +42,14 @@ describe("UserRepo Integration Tests", () => {
 
     // Assert
     expect(retrievedUser).not.toBeNull(); // Ensure retrievedUser is not null
-      // Only proceed if retrievedUser is not null
-      expect(retrievedUser?.username).toBe(userData.username);
-      expect(retrievedUser?.email).toBe(userData.email);
-      expect(retrievedUser?.password).toBe(userData.password);
-      // You may need to hash the password before comparing it
+    // Only proceed if retrievedUser is not null
+    expect(retrievedUser?.username).toBe(userData.username);
+    expect(retrievedUser?.email).toBe(userData.email);
+    expect(retrievedUser?.password).toBe(userData.password);
+    // You may need to hash the password before comparing it
   });
 
-  it("should get all users", async () => { 
+  it("should get all users", async () => {
     const userData1 = {
       username: "user1",
       email: "user1@example.com",
@@ -74,7 +74,6 @@ describe("UserRepo Integration Tests", () => {
     expect(allUsers.some((user) => user.username === userData2.username)).toBe(
       true
     );
-
   });
 
   it("should update a user's details", async () => {
