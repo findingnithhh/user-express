@@ -1,18 +1,42 @@
-import express from "express";
-import { userController } from "../controller/userController";
+import express, { Request, Response } from "express";
+import { UserController } from "../controller/userController";
 import { validateUser } from "../middleware/userValidation";
 
 const router = express.Router();
+const userController = new UserController();
 
-// Apply the validateUser middleware to routes that require user validation
-router.post("/", validateUser, userController.createUser, (req, res) => {
-  res.sendStatus(201);
+// Routes that require user validation
+// router.post("/", validateUser, async (req: Request, res: Response<any>) => {
+//   await userController.createUser(req.body);
+// });
+
+// router.put(
+//   "/:userId",
+//   validateUser,
+//   async (req: Request, res: Response<any>) => {
+//     const userController = new UserController();
+//     const userId = req.params.userId;
+//     await userController.updateUser(req, userId);
+//   }
+// );
+
+// // Routes without user validation
+router.get("/", async (req: Request, res: Response<any>) => {
+  const users = await userController.getAllUsers();
+  res.send(users);
 });
-router.put("/:userId", validateUser, userController.updateUser);
 
-// Define other routes without user validation
-router.get("/", userController.getAllUsers);
-router.get("/:userId", userController.getUserById);
-router.delete("/:userId", userController.deleteUser);
+router.get("/:userId", async (req: Request, res: Response<any>) => {
+  const userController = new UserController();
+  const { userId } = req.params;
+  const user = await userController.getUserById(userId);
+  res.send(user);
+});
+
+// router.delete("/:userId", async (req: Request, res: Response<any>) => {
+//   const userController = new UserController();
+//   const userId = req.params.userId;
+//   await userController.deleteUser(req, userId);
+// });
 
 export default router;

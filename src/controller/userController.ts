@@ -1,113 +1,116 @@
-import { Request, Response, NextFunction } from "express";
+// userController.ts
+
+import { Request, Response } from "express";
 import { UserService } from "../service/userService";
 import StatusCodes from "../utils/const/statusCode";
+import {
+  Route,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Request as TRequest,
+  Response as TResponse,
+  Path,
+  Body,
+} from "tsoa";
 
 const userService = new UserService();
 
-export const userController = {
-  getAllUsers: async (req: Request, res: Response, next: NextFunction) => {
+@Route("user")
+export class UserController {
+  @Get("/")
+  public async getAllUsers(): Promise<any> {
     try {
       const users = await userService.getAllUsers();
       if (users.length > 0) {
-        res.json({
+        return {
           status: "success",
           message: "Users are founded",
           data: users,
-        });
+        };
       } else {
-        res
-          .status(StatusCodes.NOT_FOUND.code)
-          .json({ message: "No Users Found" });
+        return {
+          status: "success",
+          message: "No Users Found",
+          data: [],
+        };
       }
     } catch (err: any) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-        .json({ error: err.message });
+      throw new Error(err.message);
     }
-  },
+  }
 
-  getUserById: async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    const userId: string = req.params.userId;
+  @Get("/{userId}")
+  public async getUserById(@Path() userId: string): Promise<any> {
     try {
       const user = await userService.getUserById(userId);
       if (!user) {
-        res
-          .status(StatusCodes.NOT_FOUND.code)
-          .json({ Status: StatusCodes.NOT_FOUND });
+        throw new Error("User not found");
       } else {
-        res
-          .status(StatusCodes.FOUND.code)
-          .json({ data: user, Status: StatusCodes.FOUND });
-      }
-    } catch (err) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-        .json({ error: StatusCodes.INTERNAL_SERVER_ERROR });
-    }
-  },
-
-  createUser: async (req: Request, res: Response): Promise<void> => {
-    const userData = req.body;
-    try {
-      const user = await userService.createUser(userData);
-      res.status(StatusCodes.CREATED.code).json({
-        data: user,
-        StatusCode: StatusCodes.CREATED.code,
-        Message: StatusCodes.CREATED.message,
-      });
-    } catch (err: any) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-        .json({ error: err.message });
-    }
-  },
-
-  updateUser: async (req: Request, res: Response): Promise<void> => {
-    const userId: string = req.params.userId;
-    const updatedUserData = req.body;
-    try {
-      const user = await userService.updateUser(userId, updatedUserData);
-      if (!user) {
-        res
-          .status(StatusCodes.NOT_FOUND.code)
-          .json({ message: StatusCodes.NOT_FOUND });
-      } else {
-        res
-          .status(StatusCodes.OK.code)
-          .json({ data: user, Status: StatusCodes.OK });
+        return {
+          data: user,
+        };
       }
     } catch (err: any) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-        .json({ error: err.message });
+      throw new Error(err.message);
     }
-  },
+  }
 
-  deleteUser: async (req: Request, res: Response): Promise<void> => {
-    const userId: string = req.params.userId;
-    try {
-      const user = await userService.deleteUser(userId);
-      if (!user) {
-        res
-          .status(StatusCodes.NOT_FOUND.code)
-          .json({ Status: StatusCodes.NOT_FOUND });
-      } else {
-        res
-          .status(StatusCodes.OK.code)
-          .json({
-            StatusCode: StatusCodes.OK.code,
-            Message: StatusCodes.OK.message,
-          })
-          .end();
-      }
-    } catch (err: any) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-        .json({ error: err.message });
-    }
-  },
-};
+  // @Post("/")
+  // public async createUser(@Body() requestBody: any): Promise<void> {
+  //   try {
+  //     const user = await userService.createUser(requestBody);
+  //     res.status(StatusCodes.CREATED.code).json({
+  //       data: user,
+  //       StatusCode: StatusCodes.CREATED.code,
+  //       Message: StatusCodes.CREATED.message,
+  //     });
+  //   } catch (err: any) {
+  //     res
+  //       .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
+  //       .json({ error: err.message });
+  //   }
+  // }
+
+  // @Put("/:userId")
+  // public async updateUser(
+  //   @TRequest() req: Request,
+  //   userId: string
+  // ): Promise<any> {
+  //   const updatedUserData = req.body; // Extract body directly from req
+  //   try {
+  //     const user = await userService.updateUser(userId, updatedUserData);
+  //     if (!user) {
+  //       throw new Error("User not found");
+  //     } else {
+  //       return {
+  //         data: user,
+  //       };
+  //     }
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
+
+  // @Delete("/:userId")
+  // public async deleteUser(
+  //   @TRequest() req: Request,
+  //   userId: string
+  // ): Promise<any> {
+  //   try {
+  //     const user = await userService.deleteUser(userId);
+  //     if (!user) {
+  //       throw new Error("User not found");
+  //     } else {
+  //       return {
+  //         status: "success",
+  //         message: "User deleted successfully",
+  //         data: user,
+  //       };
+  //     }
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
+}
