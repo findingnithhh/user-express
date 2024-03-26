@@ -26,7 +26,7 @@ export class UserController {
       if (users.length > 0) {
         return {
           status: "success",
-          message: "Users are founded",
+          message: "Users are found",
           data: users,
         };
       } else {
@@ -57,60 +57,56 @@ export class UserController {
     }
   }
 
-  // @Post("/")
-  // public async createUser(@Body() requestBody: any): Promise<void> {
-  //   try {
-  //     const user = await userService.createUser(requestBody);
-  //     res.status(StatusCodes.CREATED.code).json({
-  //       data: user,
-  //       StatusCode: StatusCodes.CREATED.code,
-  //       Message: StatusCodes.CREATED.message,
-  //     });
-  //   } catch (err: any) {
-  //     res
-  //       .status(StatusCodes.INTERNAL_SERVER_ERROR.code)
-  //       .json({ error: err.message });
-  //   }
-  // }
+  @Post("/")
+  public async createUser(@Body() requestBody: any): Promise<any> {
+    try {
+      const user = await userService.createUser(requestBody);
+      return {
+        status: "success",
+        message: "User created successfully",
+        data: user,
+      };
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  }
 
-  // @Put("/:userId")
-  // public async updateUser(
-  //   @TRequest() req: Request,
-  //   userId: string
-  // ): Promise<any> {
-  //   const updatedUserData = req.body; // Extract body directly from req
-  //   try {
-  //     const user = await userService.updateUser(userId, updatedUserData);
-  //     if (!user) {
-  //       throw new Error("User not found");
-  //     } else {
-  //       return {
-  //         data: user,
-  //       };
-  //     }
-  //   } catch (err: any) {
-  //     throw new Error(err.message);
-  //   }
-  // }
+  @Put("/{userId}")
+  public async updateUser(
+    @Path() userId: string,
+    @Body() updatedUserData: any
+  ): Promise<any> {
+    try {
+      const user = await userService.updateUser(userId, updatedUserData);
+      if (!user) {
+        throw new Error("User not found");
+      } else {
+        return {
+          status: "success",
+          message: "User updated successfully",
+          data: user,
+        };
+      }
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  }
 
-  // @Delete("/:userId")
-  // public async deleteUser(
-  //   @TRequest() req: Request,
-  //   userId: string
-  // ): Promise<any> {
-  //   try {
-  //     const user = await userService.deleteUser(userId);
-  //     if (!user) {
-  //       throw new Error("User not found");
-  //     } else {
-  //       return {
-  //         status: "success",
-  //         message: "User deleted successfully",
-  //         data: user,
-  //       };
-  //     }
-  //   } catch (err: any) {
-  //     throw new Error(err.message);
-  //   }
-  // }
+  @Delete("/{userId}")
+  public async deleteUser(@Path() userId: string): Promise<any> {
+    try {
+      const user = await userService.deleteUser(userId);
+      if (!user) {
+        throw new Error("User not found");
+      } else {
+        return {
+          status: "success",
+          message: "User deleted successfully",
+          data: user,
+        };
+      }
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  }
 }
