@@ -1,6 +1,9 @@
 import { User } from "../models/user";
 
 export class UserRepo {
+  static mockClear() {
+      throw new Error("Method not implemented.");
+  }
   async getAllUsers() {
     return await User.find({});
   }

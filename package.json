@@ -24,7 +24,7 @@
     "typescript": "^5.4.2"
   },
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon src/server.ts",
     "test": "jest --watchAll"
   },
   "keywords": [],

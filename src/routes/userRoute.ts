@@ -5,7 +5,9 @@ import { validateUser } from "../middleware/userValidation";
 const router = express.Router();
 
 // Apply the validateUser middleware to routes that require user validation
-router.post("/", validateUser, userController.createUser);
+router.post("/", validateUser, userController.createUser, (req, res) => {
+  res.sendStatus(201);
+});
 router.put("/:userId", validateUser, userController.updateUser);
 
 // Define other routes without user validation

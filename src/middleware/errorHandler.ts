@@ -8,14 +8,14 @@ function errorHandler(
   next: NextFunction
 ) {
   // Default to 500 if no status code is set
-  const statusCode = req.statusCode;
+  const statusCode = res.statusCode || 500;
 
-  //res to client
-  res.json({
+  // Send response to client
+  res.status(statusCode).json({
     statusCode: statusCode,
     message: err.message,
   });
   next();
 }
 
-export {errorHandler};
+export { errorHandler };
