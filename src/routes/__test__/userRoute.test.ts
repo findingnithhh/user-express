@@ -9,4 +9,9 @@ describe("User Routes", () => {
       expect(response.statusCode).toBe(200);
     });
   });
+
+  // Test for POST user route
+  describe("POST /user", () => {
+    
+  })
 });

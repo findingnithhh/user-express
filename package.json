@@ -33,7 +33,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "test": "jest --watchAll",
-    "swagger": "tsoa spec"
+    "swagger": "nodemon -e ts -x \"tsoa spec\""
   },
   "keywords": [],
   "author": "",
