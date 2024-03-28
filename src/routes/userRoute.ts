@@ -45,7 +45,8 @@ router.delete("/:userId", async (req: Request, res: Response<any>) => {
 // Routes without user validation
 router.get("/", async (req: Request, res: Response<any>) => {
   try {
-    const users = await userController.getAllUsers();
+
+    const users = await userController.getAllUsers(req.query);
     res.status(200).json(users);
   } catch (error: any) {
     // specify the type of 'error' explicitly

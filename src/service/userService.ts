@@ -1,5 +1,7 @@
 import { UserRepo } from "../database/repository/userRepo";
 import { hashPassword } from "../utils/hashPassword";
+import { User } from "../database/models/user";
+
 export class UserService {
   private userRepository: UserRepo;
 
@@ -7,8 +9,17 @@ export class UserService {
     this.userRepository = new UserRepo();
   }
 
-  async getAllUsers() {
-    return await this.userRepository.getAllUsers();
+  // async getAllUsers() {
+  //   return await this.userRepository.getAllUsers();
+  // }
+
+  async getAllUsers(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    return await User.find({}).skip(skip).limit(limit);
+  }
+
+  async getUserCount() {
+    return await User.countDocuments({});
   }
 
   async getUserById(userId: string) {
