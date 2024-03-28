@@ -9,10 +9,6 @@ export class UserService {
     this.userRepository = new UserRepo();
   }
 
-  // async getAllUsers() {
-  //   return await this.userRepository.getAllUsers();
-  // }
-
   async getAllUsers(page: number, limit: number) {
     const skip = (page - 1) * limit;
     return await User.find({}).skip(skip).limit(limit);

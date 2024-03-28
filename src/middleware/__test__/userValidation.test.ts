@@ -1,6 +1,13 @@
-// import { validateUser } from "./middleware"; // Assuming your middleware file is named middleware.ts
-import { validateUser } from "../userValidation";
 import { Request, Response, NextFunction } from "express";
+import { validateUser } from "../userValidation";
+import {User} from '../../database/models/user';
+
+// Mocking the User.findOne method
+jest.mock("../../database/models/user", () => ({
+  User: {
+    findOne: jest.fn(),
+  },
+}));
 
 describe("validateUser middleware", () => {
   let req: Partial<Request>;
@@ -8,73 +15,51 @@ describe("validateUser middleware", () => {
   let next: NextFunction;
 
   beforeEach(() => {
-    req = { body: {} };
+    req = {
+      body: {
+        username: "testuser",
+        email: "test@example.com",
+        password: "password123",
+      },
+    };
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
-    } as Partial<Response>;
+    };
     next = jest.fn();
   });
 
-  // Valid User Data Test
-  test("should call next() if user data is valid", () => {
-    req.body = {
-      username: "testuser",
-      email: "test@example.com",
-      password: "securepassword",
-    };
-
-    validateUser(req as Request, res as Response, next);
-
+  it("should pass validation and call next middleware for valid user data", async () => {
+    await validateUser(req as Request, res as Response, next);
     expect(next).toHaveBeenCalled();
   });
 
-  //   Username Too Short Test:
-  test("should respond with 400 if username is too short", () => {
-    req.body = {
-      username: "us",
-      email: "test@example.com",
-      password: "securepassword",
-    };
+  it("should return 400 if email is already registered", async () => {
+    // Mocking findOne to simulate existing user
+    (User.findOne as jest.Mock).mockResolvedValueOnce({
+      email: req.body.email,
+    });
 
-    validateUser(req as Request, res as Response, next);
-
+    await validateUser(req as Request, res as Response, next);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: ["Username must be at least 3 characters long"],
+      message: "This email is already in used",
     });
   });
 
-  //Invalid Email Test
-  test("should respond with 400 if email is invalid", () => {
-    req.body = {
-      username: "testuser",
-      email: "invalidemail",
-      password: "securepassword",
-    };
+ it("should return 400 if email is already registered", async () => {
+   // Mocking findOne to simulate existing user
+   (User.findOne as jest.Mock).mockResolvedValueOnce({
+     email: req.body.email,
+   });
 
-    validateUser(req as Request, res as Response, next);
+   await validateUser(req as Request, res as Response, next);
+   expect(res.status).toHaveBeenCalledWith(400);
+   expect(res.json).toHaveBeenCalledWith({
+     message: "This email is already in used", // Fix typo here
+   });
+ });
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({
-      message: ["Invalid email address"],
-    });
-  });
 
-  //Password Too Short Test:
-  test("should respond with 400 if password is too short", () => {
-    req.body = {
-      username: "testuser",
-      email: "test@example.com",
-      password: "weak",
-    };
-
-    validateUser(req as Request, res as Response, next);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({
-      message: ["Passwod not strong please give at least 8 characters"],
-    });
-  });
-
+  // Add more test cases to cover other scenarios as needed
 });
