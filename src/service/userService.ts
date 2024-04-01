@@ -9,9 +9,16 @@ export class UserService {
     this.userRepository = new UserRepo();
   }
 
-  async getAllUsers(page: number, limit: number) {
+  async getAllUsers(page: number, limit: number, username: string) {
     const skip = (page - 1) * limit;
-    return await User.find({}).skip(skip).limit(limit);
+    let query = {};
+
+    if (username) {
+      // If username is provided, filter by username
+      query = { username: { $regex: username, $options: "i" } };
+    }
+
+    return await User.find(query).skip(skip).limit(limit);
   }
 
   async getUserCount() {

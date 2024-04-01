@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/userService";
 import StatusCodes from "../utils/const/statusCode";
+import { sendVerificationEmail } from "../utils/userEmailService";
 import {
   Query,
   Route,
@@ -16,22 +17,71 @@ import {
 const userService = new UserService();
 
 interface QueryParams {
-  limit?: string;
-  page?: string;
+  limit?: number;
+  page?: number;
+  username?: string;
+}
+
+function generateVerificationCode(): string {
+  const length = 6; // Adjust the length of the verification code as needed
+  const characters = "0123456789";
+  let verificationCode = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    verificationCode += characters.charAt(randomIndex);
+  }
+  return verificationCode;
 }
 
 @Route("user")
 export class UserController {
+  // @Get("/")
+  // public async getAllUsers(@Queries() queryParams: QueryParams): Promise<any> {
+  //   try {
+  //     const pageNumber = queryParams.page ? queryParams.page : 1;
+  //     const pageSize = queryParams.limit ? queryParams.limit : 10;
+
+  //     const users = await userService.getAllUsers(
+  //       pageNumber as number,
+  //       pageSize as number
+  //     );
+
+  //     const totalCount = await userService.getUserCount();
+  //     const totalPages = Math.ceil((totalCount / pageSize) as number);
+
+  //     return {
+  //       status: "success",
+  //       message: "Users are found",
+  //       data: users,
+  //       meta: {
+  //         page: pageNumber,
+  //         limit: pageSize,
+  //         total: totalCount,
+  //         totalPages: totalPages,
+  //       },
+  //     };
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
   @Get("/")
   public async getAllUsers(@Queries() queryParams: QueryParams): Promise<any> {
     try {
-      const pageNumber = queryParams ? parseInt(queryParams.page as string) : 1;
-      const pageSize = queryParams ? parseInt(queryParams.limit as string) : 10;
+      const pageNumber = queryParams.page ? queryParams.page : 1;
+      const pageSize = queryParams.limit ? queryParams.limit : 10;
+      const nameFilter =
+        queryParams.username !== null && queryParams.username !== undefined
+          ? queryParams.username
+          : "";
 
-      const users = await userService.getAllUsers(pageNumber, pageSize);
+      const users = await userService.getAllUsers(
+        pageNumber as number,
+        pageSize as number,
+        nameFilter // Passing name filter to userService.getAllUsers function
+      );
 
       const totalCount = await userService.getUserCount();
-      const totalPages = Math.ceil(totalCount / pageSize);
+      const totalPages = Math.ceil((totalCount / pageSize) as number);
 
       return {
         status: "success",
@@ -69,9 +119,19 @@ export class UserController {
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
       const user = await userService.createUser(requestBody);
+
+      // Generate verification code
+      const verificationCode = generateVerificationCode();
+
+      // Generate verification link
+      const verificationLink = `http://localhost:30001/verify?code=${verificationCode}`;
+
+      // Send verification email
+      await sendVerificationEmail(user.email, verificationLink);
+
       return {
         status: "success",
-        message: "User created successfully",
+        message: "User created successfully. Verification email sent.",
         data: user,
       };
     } catch (err: any) {
@@ -118,5 +178,3 @@ export class UserController {
     }
   }
 }
-
-

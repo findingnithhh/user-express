@@ -10,9 +10,14 @@
 			"QueryParams": {
 				"properties": {
 					"limit": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
 						"type": "string"
 					}
 				},
@@ -51,12 +56,22 @@
 						"name": "limit",
 						"required": false,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					},
 					{
 						"in": "query",
 						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "username",
 						"required": false,
 						"schema": {
 							"type": "string"
