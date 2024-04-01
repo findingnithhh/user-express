@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/userService";
 import StatusCodes from "../utils/const/statusCode";
-import { sendVerificationEmail } from "../utils/userEmailService";
+// import { sendVerificationEmail } from "../utils/userEmailService";
+import { generateEmailVerificationToken, saveToken } from "../service/tokenService";
 import {
   Query,
   Route,
@@ -22,48 +23,8 @@ interface QueryParams {
   username?: string;
 }
 
-function generateVerificationCode(): string {
-  const length = 6; // Adjust the length of the verification code as needed
-  const characters = "0123456789";
-  let verificationCode = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    verificationCode += characters.charAt(randomIndex);
-  }
-  return verificationCode;
-}
-
 @Route("user")
 export class UserController {
-  // @Get("/")
-  // public async getAllUsers(@Queries() queryParams: QueryParams): Promise<any> {
-  //   try {
-  //     const pageNumber = queryParams.page ? queryParams.page : 1;
-  //     const pageSize = queryParams.limit ? queryParams.limit : 10;
-
-  //     const users = await userService.getAllUsers(
-  //       pageNumber as number,
-  //       pageSize as number
-  //     );
-
-  //     const totalCount = await userService.getUserCount();
-  //     const totalPages = Math.ceil((totalCount / pageSize) as number);
-
-  //     return {
-  //       status: "success",
-  //       message: "Users are found",
-  //       data: users,
-  //       meta: {
-  //         page: pageNumber,
-  //         limit: pageSize,
-  //         total: totalCount,
-  //         totalPages: totalPages,
-  //       },
-  //     };
-  //   } catch (err: any) {
-  //     throw new Error(err.message);
-  //   }
-  // }
   @Get("/")
   public async getAllUsers(@Queries() queryParams: QueryParams): Promise<any> {
     try {
@@ -115,19 +76,39 @@ export class UserController {
     }
   }
 
+  // @Post("/")
+  // public async createUser(@Body() requestBody: any): Promise<any> {
+  //   try {
+  //     const user = await userService.createUser(requestBody);
+
+  //     // Generate verification link
+  //     const verificationLink = `https://www.youtube.com/`;
+
+  //     // Send verification email
+  //     await sendVerificationEmail(user.email, verificationLink);
+
+  //     return {
+  //       status: "success",
+  //       message: "User created successfully. Verification email sent.",
+  //       data: user,
+  //     };
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
       const user = await userService.createUser(requestBody);
 
-      // Generate verification code
-      const verificationCode = generateVerificationCode();
+      // Generate verification token
+      const token = generateEmailVerificationToken(user.id);
 
-      // Generate verification link
-      const verificationLink = `http://localhost:30001/verify?code=${verificationCode}`;
+      // Save token
+      await saveToken(user.id, token);
 
-      // Send verification email
-      await sendVerificationEmail(user.email, verificationLink);
+      // Generate verification link (assuming you have a route for verification)
+      const verificationLink = `https://www.example.com/verify?token=${token}`;
 
       return {
         status: "success",
