@@ -77,26 +77,6 @@ export class UserController {
     }
   }
 
-  // @Post("/")
-  // public async createUser(@Body() requestBody: any): Promise<any> {
-  //   try {
-  //     const user = await userService.createUser(requestBody);
-
-  //     // Generate verification link
-  //     const verificationLink = `https://www.youtube.com/`;
-
-  //     // Send verification email
-  //     await sendVerificationEmail(user.email, verificationLink);
-
-  //     return {
-  //       status: "success",
-  //       message: "User created successfully. Verification email sent.",
-  //       data: user,
-  //     };
-  //   } catch (err: any) {
-  //     throw new Error(err.message);
-  //   }
-  // }
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
