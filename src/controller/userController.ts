@@ -4,6 +4,7 @@ import StatusCodes from "../utils/const/statusCode";
 import { sendVerificationEmail } from "../utils/userEmailService";
 import { generateEmailVerificationToken } from "../utils/randomToken";
 import {saveToken} from '../service/tokenService';
+// import {generateJWT} from '../utils/jwt'
 import {
   Query,
   Route,
@@ -77,19 +78,45 @@ export class UserController {
     }
   }
 
+  // @Post("/")
+  // public async createUser(@Body() requestBody: any): Promise<any> {
+  //   try {
+  //     const user = await userService.createUser(requestBody);
+
+  //     // Generate verification token
+  //     const token = generateEmailVerificationToken(user.id);
+
+  //     // Save token
+  //     await saveToken(user.id, token);
+
+  //     // Generate verification link (assuming you have a route for verification)
+  //     const verificationLink = `https://www..com/verify?token=${token}`;
+
+  //     // Send verification email
+  //     await sendVerificationEmail(user.email, verificationLink);
+
+  //     return {
+  //       status: "success",
+  //       message: "User created successfully. Verification email sent.",
+  //       data: user,
+  //     };
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
       const user = await userService.createUser(requestBody);
 
       // Generate verification token
-      const token = generateEmailVerificationToken(user.id);
+      const token = generateEmailVerificationToken(user._id); // Assuming user._id is the MongoDB ObjectId
 
       // Save token
-      await saveToken(user.id, token);
+      await saveToken(user._id, token);
 
-      // Generate verification link (assuming you have a route for verification)
-      const verificationLink = `https://www..com/verify?token=${token}`;
+      // Generate verification link
+      const verificationLink = `https://www.example.com/verify?token=${token}`;
 
       // Send verification email
       await sendVerificationEmail(user.email, verificationLink);

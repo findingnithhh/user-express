@@ -1,3 +1,4 @@
+// user-token.ts
 import mongoose from "mongoose";
 
 const tokenSchema = new mongoose.Schema({
