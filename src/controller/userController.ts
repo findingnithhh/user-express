@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/userService";
 import StatusCodes from "../utils/const/statusCode";
-// import { sendVerificationEmail } from "../utils/userEmailService";
-import { generateEmailVerificationToken, saveToken } from "../service/tokenService";
+import { sendVerificationEmail } from "../utils/userEmailService";
+import { generateEmailVerificationToken } from "../utils/randomToken";
+import {saveToken} from '../service/tokenService';
 import {
   Query,
   Route,
@@ -108,7 +109,10 @@ export class UserController {
       await saveToken(user.id, token);
 
       // Generate verification link (assuming you have a route for verification)
-      const verificationLink = `https://www.example.com/verify?token=${token}`;
+      const verificationLink = `https://www..com/verify?token=${token}`;
+
+      // Send verification email
+      await sendVerificationEmail(user.email, verificationLink);
 
       return {
         status: "success",
