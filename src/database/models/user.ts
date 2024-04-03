@@ -1,11 +1,10 @@
-// user-model.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  isVerfied: boolean;
+  isVerified: boolean;
   // Add more fields as needed
 }
 
@@ -13,7 +12,7 @@ const userSchema: Schema = new Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  isVerfied: { type: Boolean, default: false },
+  isVerified: { type: Boolean, default: false },
   // Define more fields here
 });
 

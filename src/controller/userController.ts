@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../service/userService";
 import StatusCodes from "../utils/const/statusCode";
-import { sendVerificationEmail } from "../utils/userEmailService";
+import { sendVerificationEmail } from "../utils/userEmailConfig";
 import { generateEmailVerificationToken } from "../utils/randomToken";
 import {saveToken} from '../service/tokenService';
-// import {generateJWT} from '../utils/jwt'
+import { generateToken } from '../utils/jwt'
 import {
   Query,
   Route,
@@ -16,6 +16,8 @@ import {
   Body,
   Queries,
 } from "tsoa";
+import Token from "../database/models/userToken";
+import { User } from "../database/models/user";
 
 const userService = new UserService();
 
@@ -78,32 +80,6 @@ export class UserController {
     }
   }
 
-  // @Post("/")
-  // public async createUser(@Body() requestBody: any): Promise<any> {
-  //   try {
-  //     const user = await userService.createUser(requestBody);
-
-  //     // Generate verification token
-  //     const token = generateEmailVerificationToken(user.id);
-
-  //     // Save token
-  //     await saveToken(user.id, token);
-
-  //     // Generate verification link (assuming you have a route for verification)
-  //     const verificationLink = `https://www..com/verify?token=${token}`;
-
-  //     // Send verification email
-  //     await sendVerificationEmail(user.email, verificationLink);
-
-  //     return {
-  //       status: "success",
-  //       message: "User created successfully. Verification email sent.",
-  //       data: user,
-  //     };
-  //   } catch (err: any) {
-  //     throw new Error(err.message);
-  //   }
-  // }
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
@@ -116,7 +92,7 @@ export class UserController {
       await saveToken(user._id, token);
 
       // Generate verification link
-      const verificationLink = `https://www.example.com/verify?token=${token}`;
+      const verificationLink = `http://localhost:3000/user/verify?token=${token}`;
 
       // Send verification email
       await sendVerificationEmail(user.email, verificationLink);
@@ -165,6 +141,32 @@ export class UserController {
           data: user,
         };
       }
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  }
+
+  @Get("/verify")
+  public async verifyUser(@Query() token: string): Promise<any> {
+    try {
+      // Find the token in the database
+      const tokenDoc = await Token.findOne({ token });
+      if (!tokenDoc) {
+        throw new Error("Invalid token");
+      }
+
+      // Update the user's isVerified status
+      const user = await User.findById(tokenDoc.userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      user.isVerified = true;
+      await user.save();
+
+      // Delete the token from the database
+      await Token.deleteOne({ token });
+
+      return { message: "User verified successfully" };
     } catch (err: any) {
       throw new Error(err.message);
     }

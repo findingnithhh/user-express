@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 
+
 const app: Express = express();
 
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use(time);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/user", router);
+
 
 // global error
 app.use(errorHandler);
