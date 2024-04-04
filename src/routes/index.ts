@@ -1,13 +1,46 @@
 import express, { Request, Response } from "express";
 import { UserController } from "../controller/userController";
 import { validateUser } from "../middleware/userValidation";
-// import { verifyEmailToken } from "../utils/jwt"; // Import the token verification function
 import { User } from "../database/models/user";
 import { generateEmailVerificationToken } from "../utils/randomToken";
 import Token from "../database/models/userToken";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const userController = new UserController();
+
+// login
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if the user with the given email exists
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password." });
+    }
+
+    // Compare the password with the hashed password stored in the database
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid email or password." });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, "bdkfndskfnsdkfnkdfndsfsdk", {
+      expiresIn: "1h",
+    });
+
+    // Return success message along with the token
+    res.json({ message: "Login successfully, welcome to our app.", token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "An error occurred while logging in." });
+  }
+});
 
 // Email verification route
 router.get("/verify", async (req: Request, res: Response) => {
@@ -64,8 +97,6 @@ router.post("/", async (req: Request, res: Response<any>) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 // Routes without user validation
 router.get("/", async (req: Request, res: Response<any>) => {
