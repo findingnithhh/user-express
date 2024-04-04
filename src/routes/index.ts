@@ -39,15 +39,33 @@ router.get("/verify", async (req: Request, res: Response) => {
   }
 });
 
-// Routes that require user validation
-router.post("/", validateUser, async (req: Request, res: Response<any>) => {
+router.post("/", async (req: Request, res: Response<any>) => {
   try {
+    const { email } = req.body;
+
+    // Check if user with the given email exists
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "User already created." });
+    }
+
+    // Check if user with the given email exists but not verified
+    const unverifiedUser = await User.findOne({ email, isVerified: false });
+
+    if (unverifiedUser) {
+      return res.status(400).json({ message: "Please verify your email." });
+    }
+
+    // Proceed with user creation if the user is new or already verified
     const user = await userController.createUser(req.body);
-    res.status(201).json(user); // Assuming createUser returns the created user
+    res.status(201).json(user);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 // Routes without user validation
 router.get("/", async (req: Request, res: Response<any>) => {
