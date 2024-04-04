@@ -4,7 +4,6 @@ import StatusCodes from "../utils/const/statusCode";
 import { sendVerificationEmail } from "../utils/userEmailConfig";
 import { generateEmailVerificationToken } from "../utils/randomToken";
 import {saveToken} from '../service/tokenService';
-import { generateToken } from '../utils/jwt'
 import {
   Query,
   Route,
@@ -88,7 +87,7 @@ export class UserController {
       // Generate verification token
       const token = generateEmailVerificationToken(user._id); // Assuming user._id is the MongoDB ObjectId
 
-      // Save token
+      // Save t oken
       await saveToken(user._id, token);
 
       // Generate verification link
@@ -100,7 +99,7 @@ export class UserController {
       return {
         status: "success",
         message: "User created successfully. Verification email sent.",
-        data: user,
+        // data: user,
       };
     } catch (err: any) {
       throw new Error(err.message);
