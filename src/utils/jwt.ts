@@ -10,3 +10,4 @@ export function generateToken(userId: string): string {
   });
   return token;
 }
+  

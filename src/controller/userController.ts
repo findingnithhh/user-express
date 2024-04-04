@@ -79,6 +79,32 @@ export class UserController {
     }
   }
 
+  // @Post("/")
+  // public async createUser(@Body() requestBody: any): Promise<any> {
+  //   try {
+  //     const user = await userService.createUser(requestBody);
+
+  //     // Generate verification token
+  //     const token = generateEmailVerificationToken(user._id); // Assuming user._id is the MongoDB ObjectId
+
+  //     // Save t oken
+  //     await saveToken(user._id, token);
+
+  //     // Generate verification link
+  //     const verificationLink = `http://localhost:3000/user/verify?token=${token}`;
+
+  //     // Send verification email
+  //     await sendVerificationEmail(user.email, verificationLink);
+
+  //     return {
+  //       status: "success",
+  //       message: "User created successfully. Verification email sent.",
+  //       // data: user,
+  //     };
+  //   } catch (err: any) {
+  //     throw new Error(err.message);
+  //   }
+  // }
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
@@ -87,7 +113,7 @@ export class UserController {
       // Generate verification token
       const token = generateEmailVerificationToken(user._id); // Assuming user._id is the MongoDB ObjectId
 
-      // Save t oken
+      // Save token
       await saveToken(user._id, token);
 
       // Generate verification link

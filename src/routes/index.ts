@@ -6,6 +6,7 @@ import { generateEmailVerificationToken } from "../utils/randomToken";
 import Token from "../database/models/userToken";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt";
+import { sendVerificationEmail } from "../utils/userEmailConfig";
 
 const router = express.Router();
 const userController = new UserController();
@@ -48,15 +49,68 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Email verification route
-router.get("/verify", async (req, res) => {
+// router.get("/verify", async (req, res) => {
+//   const { token } = req.query;
+
+//   try {
+//     // Find the token in the database
+//     const tokenDoc = await Token.findOne({ token });
+
+//     if (!tokenDoc) {
+//       throw new Error("Invalid token");
+//     }
+
+//     // Update the user's isVerified status
+//     const user = await User.findById(tokenDoc.userId);
+//     if (!user) {
+//       throw new Error("User not found");
+//     }
+//     user.isVerified = true;
+//     await user.save();
+
+//     // Generate JWT token after verifying the user
+//     const tokenAfterVerify = generateToken(user._id);
+
+//     // Delete the token from the database
+//     await Token.deleteOne({ token });
+
+//     res.json({ message: "User verified successfully", token: tokenAfterVerify });
+//   } catch (err: any) {
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
+router.get("/verify", async (req: Request, res: Response) => {
   const { token } = req.query;
 
   try {
     // Find the token in the database
-    const tokenDoc = await Token.findOne({ token });
+    let tokenDoc = await Token.findOne({ token });
 
     if (!tokenDoc) {
       throw new Error("Invalid token");
+    }
+
+    // Check if the token has expired
+    if (tokenDoc.expiresAt < new Date()) {
+      // Token has expired, delete it from the database
+      await Token.deleteOne({ token });
+
+      // Generate a new token and save it
+      const newToken = await generateEmailVerificationToken(
+        tokenDoc.userId.toString()
+      );
+      tokenDoc = new Token({ userId: tokenDoc.userId, token: newToken });
+      await tokenDoc.save();
+
+      // Send verification email with the new token
+      await sendVerificationEmail(tokenDoc.userId.toString(), newToken);
+
+      res.json({
+        message: "Token expired. New token generated. Verification email sent.",
+        token: newToken,
+      });
+      return; // Return here to prevent further execution of the code
     }
 
     // Update the user's isVerified status
@@ -73,7 +127,10 @@ router.get("/verify", async (req, res) => {
     // Delete the token from the database
     await Token.deleteOne({ token });
 
-    res.json({ message: "User verified successfully", token: tokenAfterVerify });
+    res.json({
+      message: "User verified successfully",
+      token: tokenAfterVerify,
+    });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
