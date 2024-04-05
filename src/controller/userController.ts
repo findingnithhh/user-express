@@ -105,6 +105,7 @@ export class UserController {
   //     throw new Error(err.message);
   //   }
   // }
+
   @Post("/")
   public async createUser(@Body() requestBody: any): Promise<any> {
     try {
@@ -112,9 +113,12 @@ export class UserController {
 
       // Generate verification token
       const token = generateEmailVerificationToken(user._id); // Assuming user._id is the MongoDB ObjectId
+      const newTime = new Date();
+
+      newTime.setMinutes(newTime.getMinutes() + 1);
 
       // Save token
-      await saveToken(user._id, token);
+      await saveToken(user._id, token, newTime);
 
       // Generate verification link
       const verificationLink = `http://localhost:3000/user/verify?token=${token}`;
@@ -125,13 +129,11 @@ export class UserController {
       return {
         status: "success",
         message: "User created successfully. Verification email sent.",
-        // data: user,
       };
     } catch (err: any) {
       throw new Error(err.message);
     }
   }
-
   @Put("/{userId}")
   public async updateUser(
     @Path() userId: string,

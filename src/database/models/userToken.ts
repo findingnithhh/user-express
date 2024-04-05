@@ -1,13 +1,13 @@
 // user-token.ts
 import mongoose from "mongoose";
+import { date } from "zod";
 
 const tokenSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, required: true },
   token: { type: String, required: true },
-  expiresAt: { type: Date, default: Date.now, index: { expires: "1m" } }, // Set expiration time for 1 day
+  expired: { type: Date, required: true },
 });
 
 const Token = mongoose.model("Token", tokenSchema);
 
 export default Token;
-
