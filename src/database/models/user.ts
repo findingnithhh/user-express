@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   isVerified: boolean;
+  googleId?: string;
   // Add more fields as needed
 }
 
@@ -13,6 +14,7 @@ const userSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
+  googleId: { type: String, unique: true },
   // Define more fields here
 });
 
