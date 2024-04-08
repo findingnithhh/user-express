@@ -9,6 +9,7 @@ import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import passport from "passport";
 import session from "express-session";
+import authRouter from "./routes/auth";
 
 // Import Passport configuration
 import "./config/passport"; // Correct import path
@@ -17,15 +18,20 @@ const app: Express = express();
 
 app.use(express.json());
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "mysecretkeynghaaa123!-1",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET || "mysecretkeynghaaa123!-1",
+//     resave: false,
+//     saveUninitialized: false,
+//   })
+// );
+
+// Initialize Passport
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // Initialize Database connection
+
 connectionToDatabase();
 
 // homepage
@@ -33,9 +39,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Server is running on port 3000");
 });
 
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
+app.use('/', authRouter)
 
 // Use routes defined in the routes/userRoutes.ts file
 app.use("/user", userRouter);

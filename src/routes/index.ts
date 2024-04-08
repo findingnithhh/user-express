@@ -13,19 +13,20 @@ const router = express.Router();
 const userController = new UserController();
 
 // Google authentication route
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+
+// router.get(
+//   "/google",
+//   passport.authenticate("google", { scope: ["profile", "email"] })
+// );
 
 // Google authentication callback route
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    res.redirect("/");
-  }
-);
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", { failureRedirect: "/" }),
+//   (req, res) => {
+//     res.redirect("/");
+//   }
+// );
 
 // login
 // router.post("/login", async (req: Request, res: Response) => {
@@ -63,6 +64,7 @@ router.get(
 //     res.status(500).json({ message: "An error occurred while logging in." });
 //   }
 // });
+
 
 // login
 router.post("/login", async (req: Request, res: Response) => {
