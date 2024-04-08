@@ -4,6 +4,7 @@ import express, { Request, Response, Router } from "express";
 import axios from "axios";
 import { IUser, User } from "../database/models/user";
 import { hashPassword } from "../utils/hashPassword";
+import { generateToken } from "../utils/jwt";
 
 const authRouter = express.Router();
 
@@ -46,7 +47,9 @@ authRouter.get("/user/google/callback", async (req: Request, res: Response) => {
     let user = await User.findOne({ email: profile.email });
 
     if (user) {
-      throw new Error("Email already exists, please sign up with another account.");
+      throw new Error(
+        "Email already exists, please sign up with another account."
+      );
     }
 
     // Create a new user if not found
@@ -58,9 +61,17 @@ authRouter.get("/user/google/callback", async (req: Request, res: Response) => {
     });
 
     // Save the new user to the database
+    // await newUser.save();
+    // console.log("User saved to database:", newUser); // Debugging statement
+
+    // Save the new user to the database
     await newUser.save();
     console.log("User saved to database:", newUser); // Debugging statement
-    res.redirect("/user");
+
+    // Generate JWT token for the new user and send it back
+    const token = generateToken(newUser._id); // Assuming _id is the MongoDB ObjectId of the user
+    return res.json({ token }); // Send JWT token back to the client
+    // res.redirect("/user");
   } catch (error: any) {
     res.redirect("/");
   }
