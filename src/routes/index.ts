@@ -23,7 +23,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.redirect("/user");
+    res.redirect("/");
   }
 );
 
@@ -99,7 +99,6 @@ router.post("/login", async (req: Request, res: Response) => {
     res.status(500).json({ message: "An error occurred while logging in." });
   }
 });
-
 
 router.get("/verify", async (req, res) => {
   const { token } = req.query;
