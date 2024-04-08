@@ -3,7 +3,6 @@ require("dotenv").config();
 import express, { Request, Response, Router } from "express";
 import axios from "axios";
 import { IUser, User } from "../database/models/user";
-import { hashPassword } from "../utils/hashPassword";
 import { generateToken } from "../utils/jwt";
 
 const authRouter = express.Router();

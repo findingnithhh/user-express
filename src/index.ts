@@ -10,7 +10,7 @@ import * as swaggerDocument from "./swagger.json";
 import passport from "passport";
 import session from "express-session";
 import authRouter from "./routes/auth";
-
+import authFacebookrouter from "./routes/authFacebook";
 // Import Passport configuration
 import "./config/passport"; // Correct import path
 
@@ -40,6 +40,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use('/', authRouter)
+
+app.use("/", authFacebookrouter);
 
 // Use routes defined in the routes/userRoutes.ts file
 app.use("/user", userRouter);
